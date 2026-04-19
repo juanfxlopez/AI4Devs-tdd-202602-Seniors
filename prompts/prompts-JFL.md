@@ -1,4 +1,75 @@
+# Prompt P-1
+
+/bmad-generate-project-context
+
+---
+
+## Follow-up prompts
+
+### FP-1.1
+[C] Continue to context generation
+
+### FP-1.2
+[P] Party Mode
+
+### FP-1.3
+Yes. Accept these changes to the Technology Stack section and continue to the Language-Specific rules
+
+### FP-1.4
+[P] Party Mode
+
+### FP-1.5
+Yes. Accept these changes to the Language-Specific rules and continue to the Framework-Specific rules
+
+### FP-1.6
+[P] Party Mode
+
+### FP-1.7
+Yes. Accept these changes to the Framework-Specific rules and continue to the Testing rules
+
+### FP-1.8
+[P] Party Mode
+
+### FP-1.9
+Yes. Accept these changes to the Testing rules and continue to the Code Quality & Style rules
+
+### FP-1.10
+[P] Party Mode
+
+### FP-1.11
+Yes. Accept these changes to the Code Quality & Style rules and continue to the Development Workflow rules
+
+### FP-1.12
+[P] Party Mode
+
+### FP-1.13
+Yes. Accept these changes to the Development Workflow rules and continue to the Critical Don’t-Miss rules
+
+### FP-1.14
+[P] Party Mode
+
+### FP-1.15
+Yes. Accept these changes to the Critical Don’t-Miss rules
+
+
+---
+---
+
+# Prompt P-2
+
 You are an expert in prompt engineering and sudolang. Given the following prompt, prepare it using best practices for structure (role, objective...) and format to achieve a precise and exhaustive result. Stick only to the requested objective by carefully analyzing what is asked in the original prompt, and always create the prompt in English and using sudolang. Do not execute the prompt. # Original prompt: " Eres un experto en testing typescript con ts-jest. Dada la funcionalidad de insertar candidatos en base de datos [Add candidate to the Data Base] de la cual no se tiene la historia de usuario explicita ni criterios de aceptacion explicitos, pero solo la implementacion en el codigo, tu misión será crear una suite de tests unitarios en Jest para dicha functionalidad. Apóyate en el codgo actual el contexto del proyecto para identificar aquellos tests que puedan ser relevantes en este caso. Pista 1: hay 2 familias principales de tests, recepción de los datos del formulario, y guardado en la base de datos. Se desea ver tests que cubran ambos procesos. Utiliza buenas prácticas de testing en la medida de lo posible, y añade todos los casos límite que consideres. Crea los tests en un fichero tests-JFL.test.ts en la carpeta backend/src/tests. Contexto del proyecto: [project-context.md] " The project-context.md file is attached so you can understand the structure.
+
+---
+
+## Follow-up prompts
+
+### FP-2.1
+can you make the file completely in sudolang?
+
+---
+---
+
+# Prompt P-3
 
 Execute PromptFile "generate-add-candidate-unit-tests.sudo" {
 
@@ -254,3 +325,13 @@ Execute PromptFile "generate-add-candidate-unit-tests.sudo" {
     Reverse-engineer the add-candidate functionality from the existing codebase and project context, then generate the complete content of "backend/src/tests/tests-JFL.test.ts" as a Jest unit test suite that is precise, exhaustive, implementation-grounded, database-mocked, and limited strictly to the requested objective.
   }
 }
+
+---
+
+## Follow-up prompts
+
+### FP-3.1
+Can you run the tests and verify that all pass?
+
+---
+---
