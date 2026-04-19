@@ -61,6 +61,19 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
     expect(() => validateCandidateData(payload)).not.toThrow();
   });
 
+  test('does not skip validation when id is 0 (falsy id)', () => {
+    // Arrange — implementation uses `if (data.id)`; 0 is falsy
+    const payload = {
+      id: 0,
+      firstName: '',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+    };
+
+    // Act / Assert
+    expect(() => validateCandidateData(payload)).toThrow('Invalid name');
+  });
+
   describe('required fields', () => {
     test.each([
       ['firstName', { lastName: 'Doe', email: 'a@b.com' }],
@@ -135,6 +148,30 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
       // Act / Assert
       expect(() => validateCandidateData(payload)).not.toThrow();
     });
+
+    test('accepts first and last name at minimum length (2 characters)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'Jo',
+        lastName: 'Li',
+        email: 'jo@li.com',
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('accepts first and last name at maximum length (100 characters)', () => {
+      // Arrange
+      const payload = {
+        firstName: repeat('A', 100),
+        lastName: repeat('B', 100),
+        email: 'ab@example.com',
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
   });
 
   describe('email validation', () => {
@@ -190,6 +227,31 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
         expect(() => validateCandidateData(payload)).not.toThrow();
       },
     );
+
+    test('allows omitted phone (optional)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows empty-string phone (treated as omitted)', () => {
+      // Arrange — validatePhone uses `if (phone && ...)`
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        phone: '',
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
   });
 
   describe('address validation', () => {
@@ -213,6 +275,31 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
         lastName: 'Doe',
         email: 'john@doe.com',
         address: repeat('a', 100),
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows omitted address', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows empty-string address', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        address: '',
       };
 
       // Act / Assert
@@ -284,6 +371,64 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
       // Act / Assert
       expect(() => validateCandidateData(payload)).toThrow(message);
     });
+
+    test('allows omitted endDate on education', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        educations: [
+          {
+            institution: 'Uni',
+            title: 'CS',
+            startDate: '2020-01-01',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows empty-string endDate on education (falsy skips endDate format check)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        educations: [
+          {
+            institution: 'Uni',
+            title: 'CS',
+            startDate: '2020-01-01',
+            endDate: '',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('accepts institution and title at maximum length (100 characters)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        educations: [
+          {
+            institution: repeat('U', 100),
+            title: repeat('T', 100),
+            startDate: '2020-01-01',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
   });
 
   describe('work experience validation (workExperiences)', () => {
@@ -345,6 +490,64 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
       // Act / Assert
       expect(() => validateCandidateData(payload)).toThrow(message);
     });
+
+    test('allows omitted endDate on work experience', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        workExperiences: [
+          {
+            company: 'ACME',
+            position: 'Dev',
+            startDate: '2020-01-01',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows description at maximum length (200 characters)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        workExperiences: [
+          {
+            company: 'ACME',
+            position: 'Dev',
+            description: repeat('x', 200),
+            startDate: '2020-01-01',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('allows omitted description', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        workExperiences: [
+          {
+            company: 'ACME',
+            position: 'Dev',
+            startDate: '2020-01-01',
+          },
+        ],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
   });
 
   describe('cv validation', () => {
@@ -379,12 +582,60 @@ describe('Add candidate - form data reception (validateCandidateData)', () => {
       // Act / Assert
       expect(() => validateCandidateData(payload)).not.toThrow();
     });
+
+    test('does not validate cv when cv is null (short-circuit before validateCV)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        cv: null,
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
+
+    test('rejects array used as cv (arrays are objects but lack string filePath/fileType)', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        cv: ['/uploads/a.pdf', 'application/pdf'],
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).toThrow('Invalid CV data');
+    });
+
+    test('allows cv with extra properties if filePath and fileType are valid strings', () => {
+      // Arrange
+      const payload = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+        cv: {
+          filePath: '/uploads/cv.pdf',
+          fileType: 'application/pdf',
+          uploadedBy: 'system',
+        },
+      };
+
+      // Act / Assert
+      expect(() => validateCandidateData(payload)).not.toThrow();
+    });
   });
 
   describe('malformed payload structures', () => {
     test('rejects when payload is null (non-object)', () => {
       // Arrange / Act / Assert
       expect(() => validateCandidateData(null)).toThrow();
+    });
+
+    test('rejects when payload is undefined', () => {
+      // Arrange / Act / Assert
+      expect(() => validateCandidateData(undefined)).toThrow();
     });
 
     test('rejects when educations is not an array (iterable leads to invalid items)', () => {
@@ -613,6 +864,110 @@ describe('Add candidate - database save (service addCandidate)', () => {
 
     // Act / Assert
     await expect(addCandidate(payload)).rejects.toThrow('DB is down');
+  });
+
+  test('does not call nested saves when educations and workExperiences are empty arrays', async () => {
+    // Arrange — truthy arrays iterate zero times
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+      educations: [],
+      workExperiences: [],
+    };
+    const savedCandidate = { id: 42, ...payload };
+
+    candidateSaveSpy.mockResolvedValue(savedCandidate as any);
+
+    // Act
+    const result = await addCandidate(payload);
+
+    // Assert
+    expect(result).toEqual(savedCandidate);
+    expect(candidateSaveSpy).toHaveBeenCalledTimes(1);
+    expect(educationSaveSpy).not.toHaveBeenCalled();
+    expect(workExperienceSaveSpy).not.toHaveBeenCalled();
+  });
+
+  test('maps any P2002 from education.save to the email-uniqueness message (same catch as candidate)', async () => {
+    // Arrange — outer catch treats all P2002 alike
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+      educations: [{ institution: 'U', title: 'T', startDate: '2020-01-01' }],
+    };
+
+    candidateSaveSpy.mockResolvedValue({ id: 7, ...payload } as any);
+    educationSaveSpy.mockRejectedValue({ code: 'P2002' });
+
+    // Act / Assert
+    await expect(addCandidate(payload)).rejects.toThrow(
+      'The email already exists in the database',
+    );
+    expect(candidateSaveSpy).toHaveBeenCalledTimes(1);
+    expect(educationSaveSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('propagates error if a later education.save fails after earlier ones succeeded', async () => {
+    // Arrange
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+      educations: [
+        { institution: 'A', title: 'T1', startDate: '2020-01-01' },
+        { institution: 'B', title: 'T2', startDate: '2021-01-01' },
+      ],
+    };
+
+    candidateSaveSpy.mockResolvedValue({ id: 88, ...payload } as any);
+    educationSaveSpy
+      .mockResolvedValueOnce({} as any)
+      .mockRejectedValueOnce(new Error('education persist failed'));
+
+    // Act / Assert
+    await expect(addCandidate(payload)).rejects.toThrow('education persist failed');
+    expect(candidateSaveSpy).toHaveBeenCalledTimes(1);
+    expect(educationSaveSpy).toHaveBeenCalledTimes(2);
+  });
+
+  test('propagates error if workExperience.save fails after candidate.save succeeds', async () => {
+    // Arrange
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+      workExperiences: [
+        { company: 'ACME', position: 'Dev', startDate: '2020-01-01' },
+      ],
+    };
+
+    candidateSaveSpy.mockResolvedValue({ id: 99, ...payload } as any);
+    workExperienceSaveSpy.mockRejectedValue(new Error('work experience persist failed'));
+
+    // Act / Assert
+    await expect(addCandidate(payload)).rejects.toThrow('work experience persist failed');
+    expect(candidateSaveSpy).toHaveBeenCalledTimes(1);
+    expect(workExperienceSaveSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('propagates error if resume.save fails after candidate.save succeeds', async () => {
+    // Arrange
+    const payload = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+      cv: { filePath: '/x.pdf', fileType: 'application/pdf' },
+    };
+
+    candidateSaveSpy.mockResolvedValue({ id: 100, ...payload } as any);
+    resumeSaveSpy.mockRejectedValue(new Error('resume persist failed'));
+
+    // Act / Assert
+    await expect(addCandidate(payload)).rejects.toThrow('resume persist failed');
+    expect(candidateSaveSpy).toHaveBeenCalledTimes(1);
+    expect(resumeSaveSpy).toHaveBeenCalledTimes(1);
   });
 
   test('throws a wrapped error when payload is malformed (null)', async () => {

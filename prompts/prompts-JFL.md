@@ -333,5 +333,8 @@ Execute PromptFile "generate-add-candidate-unit-tests.sudo" {
 ### FP-3.1
 Can you run the tests and verify that all pass?
 
+### FP-3.2
+Can you think in other edge cases that can fail for the service addCandidate and/or for validateCandidateData? If so, implement them and test them.
+
 ---
 ---
